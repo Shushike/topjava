@@ -8,9 +8,7 @@ public class TimeUtil {
     }
 
     public static boolean isInPeriod(LocalTime lt, LocalTime startTime, LocalTime endTime) {
-        return startTime == null && endTime == null
-                || startTime == null && lt.compareTo(endTime) < 0
-                || endTime == null && lt.compareTo(startTime) >= 0
-                || startTime != null && lt.compareTo(startTime) >= 0 && endTime != null && lt.compareTo(endTime) < 0;
+        return (startTime == null || lt.compareTo(startTime) >= 0)
+                && (endTime == null || lt.compareTo(endTime) < 0);
     }
 }

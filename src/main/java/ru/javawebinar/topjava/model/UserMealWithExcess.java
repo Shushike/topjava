@@ -10,17 +10,13 @@ public class UserMealWithExcess {
 
     private final int calories;
 
-    private boolean excess;
+    private final boolean excess;
 
     public UserMealWithExcess(LocalDateTime dateTime, String description, int calories, boolean excess) {
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
-    }
-
-    public void setExcess(boolean excessed) {
-        excess = excessed;
     }
 
     public LocalDate getDate() {
