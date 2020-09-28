@@ -23,24 +23,22 @@ public class UserMealsUtil {
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500)
         );
 
-        List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 3000);
+        List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsTo.forEach(System.out::println);
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         final Map<LocalDate, Integer> caloriesByDates = new HashMap<>();
-        final List<UserMeal> sortedList = new ArrayList<>();
         for (UserMeal meal : meals) {
             caloriesByDates.merge(meal.getDate(), meal.getCalories(), Integer::sum);
-            if (TimeUtil.isInPeriod(meal.getTime(), startTime, endTime)) {
-                sortedList.add(meal);
-            }
         }
         final List<UserMealWithExcess> exceededList = new ArrayList<>();
-        sortedList.forEach(meal -> {
+        for (UserMeal meal : meals) {
             Integer daySum = caloriesByDates.get(meal.getDate());
-            exceededList.add(new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), daySum > caloriesPerDay));
-        });
+            if (TimeUtil.isInPeriod(meal.getTime(), startTime, endTime)) {
+                exceededList.add(new UserMealWithExcess(meal.getDateTime(), meal.getDescription(), meal.getCalories(), daySum > caloriesPerDay));
+            }
+        }
         return exceededList;
     }
 
