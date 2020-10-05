@@ -21,8 +21,6 @@ public class RuntimeMealDao implements EntityDao<Meal> {
                     meals = new ConcurrentHashMap<>();
                     for (Meal meal : MealsUtil.getMeals()) {
                         add(meal);
-                        //meal.setId(idCounter.incrementAndGet());
-                        //meals.put(meal.getId(), meal);
                     }
                 }
             }
