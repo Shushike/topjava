@@ -42,17 +42,7 @@ public class MealsUtil {
     }
 
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
-    }
-
-    public static List<MealTo> filter(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        final Map<LocalDate, Integer> caloriesByDates = meals.stream()
-                .collect(Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories)));
-        return meals.stream()
-                .filter(meal -> TimeUtil.isInPeriod(meal.getTime(), startTime, endTime))
-                .map(meal -> new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(),
-                        caloriesByDates.get(meal.getDate()) > caloriesPerDay))
-                .collect(Collectors.toList());
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 
     private static class MealsHolder {
@@ -67,7 +57,7 @@ public class MealsUtil {
         );
     }
 
-    public static List<Meal> getMeals(){
+    public static List<Meal> getMeals() {
         return MealsHolder.initMealList;
     }
 }

@@ -1,18 +1,17 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.dao;
 
+import ru.javawebinar.topjava.dao.EntityDao;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RuntimeMealDao implements EntityDao<Meal> {
-    //для реализации при хранении в памяти
-    private Map<Integer, Meal> meals = null;
+    private Map<Integer, Meal> meals;
     private static AtomicInteger idCounter = new AtomicInteger(0);
 
     private Map<Integer, Meal> getMeals() {
@@ -21,8 +20,9 @@ public class RuntimeMealDao implements EntityDao<Meal> {
                 if (meals == null) {
                     meals = new ConcurrentHashMap<>();
                     for (Meal meal : MealsUtil.getMeals()) {
-                        meal.setId(idCounter.incrementAndGet());
-                        meals.put(meal.getId(), meal);
+                        add(meal);
+                        //meal.setId(idCounter.incrementAndGet());
+                        //meals.put(meal.getId(), meal);
                     }
                 }
             }
@@ -31,17 +31,17 @@ public class RuntimeMealDao implements EntityDao<Meal> {
     }
 
     @Override
-    public boolean add(Meal entity) {
+    public Meal add(Meal entity) {
         if (!entity.isSetId())
             entity.setId(idCounter.incrementAndGet());
         meals.put(entity.getId(), entity);
-        return true;
+        return entity;
     }
 
     @Override
-    public boolean update(Meal entity) {
+    public Meal update(Meal entity) {
         getMeals().replace(entity.getId(), entity);
-        return true;
+        return entity;
     }
 
     @Override
