@@ -14,18 +14,11 @@ public class RuntimeMealDao implements EntityDao<Meal> {
     private Map<Integer, Meal> meals;
     private static AtomicInteger idCounter = new AtomicInteger(0);
 
-    private Map<Integer, Meal> getMeals() {
-        if (meals == null) {
-            synchronized (this) {
-                if (meals == null) {
-                    meals = new ConcurrentHashMap<>();
-                    for (Meal meal : MealsUtil.getMeals()) {
-                        add(meal);
-                    }
-                }
-            }
+    public RuntimeMealDao() {
+        meals = new ConcurrentHashMap<>();
+        for (Meal meal : MealsUtil.getMeals()) {
+            add(meal);
         }
-        return meals;
     }
 
     @Override
@@ -38,7 +31,7 @@ public class RuntimeMealDao implements EntityDao<Meal> {
     @Override
     public Meal update(Meal entity) {
         try {
-            getMeals().replace(entity.getId(), entity);
+            meals.replace(entity.getId(), entity);
         } catch (Throwable e) {
             return null;
         }
@@ -47,16 +40,16 @@ public class RuntimeMealDao implements EntityDao<Meal> {
 
     @Override
     public void delete(int id) {
-        getMeals().remove(id);
+        meals.remove(id);
     }
 
     @Override
     public List<Meal> getAll() {
-        return new ArrayList(getMeals().values());
+        return new ArrayList(meals.values());
     }
 
     @Override
     public Meal getById(int id) {
-        return getMeals().get(id);
+        return meals.get(id);
     }
 }
