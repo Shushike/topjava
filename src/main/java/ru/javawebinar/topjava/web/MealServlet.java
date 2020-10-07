@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
+import ru.javawebinar.topjava.dao.EntityDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.dao.RuntimeMealDao;
 import ru.javawebinar.topjava.model.MealTo;
@@ -22,14 +23,15 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final String ACTION_NAME = "action";
-    private static final String MEALS_LIST = "/topjava/meals";
     private static final Logger log = getLogger(MealServlet.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-    private RuntimeMealDao dao;
+    private String mealsList;
+    private EntityDao<Meal> dao;
 
     @Override
-    public void init(ServletConfig config) throws ServletException{
+    public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        mealsList = config.getServletContext().getContextPath() + "/meals";
         dao = new RuntimeMealDao();
     }
 
@@ -57,7 +59,7 @@ public class MealServlet extends HttpServlet {
                     dao.delete(deletedId);
                 }
                 getMealsTo(request);
-                response.sendRedirect(MEALS_LIST);
+                response.sendRedirect(mealsList);
                 break;
             case "list":
             default:
@@ -83,7 +85,7 @@ public class MealServlet extends HttpServlet {
             dao.update(newMeal);
         log.debug("Post meals list");
         getMealsTo(request);
-        response.sendRedirect(MEALS_LIST);
+        response.sendRedirect(mealsList);
     }
 
     private Integer getIntegerParam(HttpServletRequest request, String paramName) {
@@ -110,7 +112,7 @@ public class MealServlet extends HttpServlet {
     }
 
     private void getMealsTo(HttpServletRequest request) {
-        List<MealTo> meals = MealsUtil.filteredByStreams(dao.getAll(),  //MealsUtil.getMeals(),
+        List<MealTo> meals = MealsUtil.filteredByStreams(dao.getAll(),
                 LocalTime.MIN, LocalTime.MAX,
                 2000);
         request.setAttribute("list", meals);

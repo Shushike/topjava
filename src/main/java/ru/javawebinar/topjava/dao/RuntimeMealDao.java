@@ -30,15 +30,18 @@ public class RuntimeMealDao implements EntityDao<Meal> {
 
     @Override
     public Meal add(Meal entity) {
-        if (!entity.isSetId())
-            entity.setId(idCounter.incrementAndGet());
+        entity.setId(idCounter.incrementAndGet());
         meals.put(entity.getId(), entity);
         return entity;
     }
 
     @Override
     public Meal update(Meal entity) {
-        getMeals().replace(entity.getId(), entity);
+        try {
+            getMeals().replace(entity.getId(), entity);
+        } catch (Throwable e) {
+            return null;
+        }
         return entity;
     }
 

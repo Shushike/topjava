@@ -20,8 +20,7 @@ public class MealTo {
     }
 
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
-        if (id!=null)
-            this.id = id;
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
