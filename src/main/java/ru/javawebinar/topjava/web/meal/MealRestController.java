@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
@@ -26,7 +27,11 @@ public class MealRestController {
         service.update(meal);
     }
 
-    public Collection<Meal> getAll(){
+    public Collection<Meal> getAll() {
         return service.getAll(authUserId());
+    }
+
+    public Collection<Meal> getAll(LocalDateTime from, LocalDateTime to) {
+        return service.getAll(authUserId(), from, to);
     }
 }

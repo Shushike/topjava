@@ -21,6 +21,21 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
+
+    <form method="get" action="meals">
+        <table>
+            <tr>
+                <td><label>From date:</label></td><td><input type="date" value="${fromDate}" name="fromDate"></td>
+                <td><label>From time:</label></td><td><input type="time" value="${fromTime}" name="fromTime"> </td>
+            </tr>
+            <tr>
+                <td><label>To date:</label></td><td><input type="date" value="${toDate}" name="toDate"></td>
+                <td><label>To time:</label></td><td><input type="time" value="${toTime}" name="toTime"> </td>
+            </tr>
+            <tr><td colspan="4" align="right"><button type="submit">Filter</button></td></tr>
+        </table>
+    </form>
+
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
@@ -49,6 +64,7 @@
             </tr>
         </c:forEach>
     </table>
+
 </section>
 </body>
 </html>

@@ -20,7 +20,7 @@ public class SpringMain {
             adminUserController.create(new User(null, "userName", "email@mail.ru", "password", Role.ADMIN));
 
             MealRestController mealRestController = appCtx.getBean(MealRestController.class);
-            mealRestController.getAll().stream().forEach(meal ->  System.out.println(meal.toString()));
+            mealRestController.getAll().stream().forEach(meal -> System.out.println(meal.toString()));
             Meal someMeal = mealRestController.get(2);
             System.out.println("----------------------");
             System.out.println(someMeal.toString());
@@ -29,7 +29,7 @@ public class SpringMain {
             mealRestController.delete(2);
             System.out.println("----------------------");
             Collection<Meal> all2 = mealRestController.getAll();
-            for (Meal meal: all2)
+            for (Meal meal : all2)
                 System.out.println(meal.toString());
         }
     }

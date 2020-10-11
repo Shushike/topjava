@@ -5,6 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -55,6 +56,15 @@ public class InMemoryMealRepository implements MealRepository {
         return repository.values().stream()
                 .filter(meal -> meal.getUserId() == userId)
                 .sorted(Comparator.comparing(Meal::getDateTime, Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<Meal> getAll(Integer userId, LocalDateTime from, LocalDateTime to) {
+        return getAll(userId).stream()
+                .filter(meal ->
+                        (from == null || !meal.getDate().isBefore(from.toLocalDate()))
+                                && (to == null || !meal.getDate().isAfter(to.toLocalDate())))
                 .collect(Collectors.toList());
     }
 }
