@@ -21,8 +21,9 @@ public class UserServlet extends HttpServlet {
         if (paramUserId != null && !paramUserId.isEmpty()) {
             final int userId = Integer.parseInt(paramUserId);
             SecurityUtil.setAuthUserId(userId);
+            response.sendRedirect("meals");
+            return;
         }
         request.getRequestDispatcher("/users.jsp").forward(request, response);
     }
-
 }

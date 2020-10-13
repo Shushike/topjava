@@ -18,14 +18,11 @@ public class SpringMain {
             System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));
             AdminRestController adminUserController = appCtx.getBean(AdminRestController.class);
             adminUserController.create(new User(null, "userName", "email@mail.ru", "password", Role.ADMIN));
+            adminUserController.getAll().forEach(System.out::println);
 
             MealRestController mealRestController = appCtx.getBean(MealRestController.class);
-            mealRestController.getAll().stream().forEach(meal -> System.out.println(meal.toString()));
-            Meal someMeal = mealRestController.get(2);
-            System.out.println("----------------------");
-            System.out.println(someMeal.toString());
-            someMeal.calories = 888;
-            mealRestController.update(someMeal);
+            mealRestController.getAll().forEach(meal -> System.out.println(meal.toString()));
+            mealRestController.get(2);
             mealRestController.delete(2);
             System.out.println("----------------------");
             Collection<Meal> all2 = mealRestController.getAll();

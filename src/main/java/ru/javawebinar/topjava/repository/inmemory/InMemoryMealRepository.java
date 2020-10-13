@@ -5,9 +5,10 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +35,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public boolean delete(int id, Integer userId) {
+    public boolean delete(int id, int userId) {
         final Meal meal = repository.get(id);
         if (meal != null && meal.getUserId() == userId) {
             return repository.remove(id) != null;
@@ -43,7 +44,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Meal get(int id, Integer userId) {
+    public Meal get(int id, int userId) {
         final Meal meal = repository.get(id);
         if (meal != null && meal.getUserId() == userId) {
             return meal;
@@ -52,7 +53,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getAll(Integer userId) {
+    public List<Meal> getAll(int userId) {
         return repository.values().stream()
                 .filter(meal -> meal.getUserId() == userId)
                 .sorted(Comparator.comparing(Meal::getDateTime, Comparator.reverseOrder()))
@@ -60,11 +61,11 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getAll(Integer userId, LocalDateTime from, LocalDateTime to) {
+    public List<Meal> getFiltredByUserAndTime(int userId, LocalDate from, LocalDate to) {
         return getAll(userId).stream()
                 .filter(meal ->
-                        (from == null || !meal.getDate().isBefore(from.toLocalDate()))
-                                && (to == null || !meal.getDate().isAfter(to.toLocalDate())))
+                        (from == null || !meal.getDate().isBefore(from))
+                                && (to == null || !meal.getDate().isAfter(to)))
                 .collect(Collectors.toList());
     }
 }
