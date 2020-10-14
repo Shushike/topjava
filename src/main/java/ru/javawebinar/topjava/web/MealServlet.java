@@ -41,11 +41,9 @@ public class MealServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String idParam = request.getParameter("id");
         Integer id = null;
-        if (idParam!=null && !idParam.isEmpty()) {
+        if (idParam != null && !idParam.isEmpty()) {
             id = getId(request);
-            mealRestController.get(id);
         }
-
         Meal meal = new Meal(id,
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
@@ -88,11 +86,7 @@ public class MealServlet extends HttpServlet {
                 final LocalTime fromTime = getTimeParam(request, "fromTime");
                 final LocalTime toTime = getTimeParam(request, "toTime");
 
-                request.setAttribute("meals",
-                        MealsUtil.getFilteredTos(mealRestController.getFiltredByUserAndTime(fromDate, toDate), //repository.getAll(SecurityUtil.authUserId()),
-                                SecurityUtil.authUserCaloriesPerDay(),
-                                fromTime,
-                                toTime));
+                request.setAttribute("meals", mealRestController.getFiltredByUserAndDateAndTime(fromDate, toDate, fromTime, toTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }

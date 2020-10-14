@@ -20,6 +20,7 @@ public class InMemoryUserRepository implements UserRepository {
     {
         Arrays.asList(
                 new User("Name", "e@mail.com", "pwd", Role.USER, Role.USER),
+                new User("Name", "ae@mail.com", "pwd", Role.USER, Role.USER),
                 new User("User", "user@yandex.ru", "000", Role.USER, Role.USER),
                 new User("Other", "other@gmail.com", "user", Role.USER, Role.USER),
                 new User("Admin", "admin@mail.com", "admin", Role.ADMIN, Role.USER)
@@ -53,7 +54,7 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         ArrayList<User> users = new ArrayList<>(repository.values());
-        users.sort(Comparator.comparing(User::getName, Comparator.naturalOrder()));
+        users.sort(Comparator.comparing(User::getName, Comparator.naturalOrder()).thenComparing(User::getEmail, Comparator.naturalOrder()));
         return users;
     }
 

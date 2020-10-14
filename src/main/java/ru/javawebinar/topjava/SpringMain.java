@@ -5,6 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 import ru.javawebinar.topjava.web.user.AdminRestController;
 
@@ -25,8 +26,8 @@ public class SpringMain {
             mealRestController.get(2);
             mealRestController.delete(2);
             System.out.println("----------------------");
-            Collection<Meal> all2 = mealRestController.getAll();
-            for (Meal meal : all2)
+            Collection<MealTo> all2 = mealRestController.getAll();
+            for (MealTo meal : all2)
                 System.out.println(meal.toString());
         }
     }

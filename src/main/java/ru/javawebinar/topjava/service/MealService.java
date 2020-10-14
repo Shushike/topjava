@@ -18,8 +18,8 @@ public class MealService {
         this.repository = repository;
     }
 
-    public Meal create(Meal meal) {
-        return repository.save(meal);
+    public Meal create(Meal meal, Integer userId) {
+        return repository.save(meal, userId);
     }
 
     public void delete(int id, Integer userId) {
@@ -34,12 +34,12 @@ public class MealService {
         return repository.getAll(userId);
     }
 
-    public List<Meal> getFiltredByUserAndTime(Integer userId, LocalDate from, LocalDate to) {
-        return repository.getFiltredByUserAndTime(userId, from, to);
+    public List<Meal> getFiltredByUserAndDate(Integer userId, LocalDate from, LocalDate to) {
+        return repository.getFilteredByUserAndDate(userId, from, to);
     }
 
-    public void update(Meal meal) {
-        checkNotFoundWithId(repository.save(meal), meal.getId());
+    public void update(Meal meal, Integer userId) {
+        checkNotFoundWithId(repository.save(meal, userId), meal.getId());
     }
 
 }
