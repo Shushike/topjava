@@ -1,7 +1,14 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -10,9 +17,11 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.user.InMemoryAdminRestControllerTest;
 
-import java.time.LocalDate;
-import java.time.Month;
+import java.time.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -26,6 +35,46 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    private static final Logger log = LoggerFactory.getLogger(InMemoryAdminRestControllerTest.class);
+
+    private static Map<String, Long> timeMap;
+
+    protected static Long addTime(String name, Long ms) {
+        timeMap.putIfAbsent(name, ms);
+        return ms;
+    }
+
+    @ClassRule
+    public static ExternalResource classWatcher = new ExternalResource() {
+        @Override
+        protected void before() throws Throwable {
+            timeMap = new HashMap<>();
+        }
+
+        @Override
+        protected void after() {
+            log.debug("Total: ");
+            timeMap.forEach((s, aLong) -> {
+                log.debug(String.format("Test '%s' - %d ms", s, aLong));
+            });
+        }
+    };
+
+    @Rule
+    public TestWatcher watcher = new TestWatcher() {
+        private LocalTime startTime;
+
+        @Override
+        protected void starting(Description description) {
+            startTime = LocalTime.now();
+        }
+
+        @Override
+        protected void finished(Description description) {
+            log.debug(String.format("%s - %d ms", description.getMethodName(),
+                    addTime(description.getMethodName(), Duration.between(startTime, LocalTime.now()).toMillis())));
+        }
+    };
 
     @Autowired
     private MealService service;
