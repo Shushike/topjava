@@ -21,6 +21,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -54,7 +55,7 @@ public class MealServiceTest {
         protected void after() {
             StringBuilder stringBuilder = new StringBuilder("\u001B[32m\nTotal:\n");
             timeMap.forEach((s, aLong) -> {
-                stringBuilder.append(String.format("Test '%s' - %d ms \n", s, aLong));
+                stringBuilder.append(String.format("%1$-25s - %2$d ms \n", s, aLong));
             });
             stringBuilder.append("\u001B[0m");
             log.debug(stringBuilder.toString());
@@ -66,7 +67,7 @@ public class MealServiceTest {
         @Override
         protected void finished(long nanos, Description description) {
             log.debug(String.format("%s - %d ms", description.getMethodName(),
-                    addTime(description.getMethodName(), nanos/1000000)));
+                    addTime(description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos))));
         }
     };
 

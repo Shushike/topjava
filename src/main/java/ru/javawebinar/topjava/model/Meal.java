@@ -18,20 +18,19 @@ import javax.validation.constraints.Size;
                 "and m.dateTime<:endTime ORDER BY m.dateTime DESC"),
 })
 @Entity
-@Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meals_unique_user_datetime_idx")})
+@Table(name = "meals", uniqueConstraints = {@UniqueConstraint(columnNames = {Meal.userIdName, Meal.dateTimeName}, name = "meals_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
 
     public static final String idName = "id";
     public static final String userIdName = "user_id";
-    public static final String startTimeName = "startTime";
-    public static final String endTimeName = "endTime";
+    public static final String dateTimeName = "date_time";
 
     public static final String DELETE = "Meal.delete";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String BY_TIME = "Meal.getByTime";
     public static final String BY_ID = "Meal.getById";
 
-    @Column(name = "date_time", nullable = false)
+    @Column(name = Meal.dateTimeName, nullable = false)
     @NotNull
     private LocalDateTime dateTime;
 
@@ -44,7 +43,7 @@ public class Meal extends AbstractBaseEntity {
     @Range(min = 10, max = 10000)
     private int calories;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     @JoinColumn(name = userIdName, nullable = false)
     private User user;

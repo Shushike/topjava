@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.jpa;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
@@ -53,14 +54,12 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        try {
-            return em.createNamedQuery(Meal.BY_ID, Meal.class)
+        List<Meal> resultList =  em.createNamedQuery(Meal.BY_ID, Meal.class)
                     .setParameter(Meal.idName, id)
                     .setParameter(Meal.userIdName, userId)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+                    .getResultList();
+        return DataAccessUtils.singleResult(resultList);
+
         /*
         Meal result = em.find(Meal.class, id);
         if (result!=null && result.getUser()!=null && result.getUser().getId()==userId)
@@ -79,8 +78,8 @@ public class JpaMealRepository implements MealRepository {
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return em.createNamedQuery(Meal.BY_TIME, Meal.class)
                 .setParameter(Meal.userIdName, userId)
-                .setParameter(Meal.startTimeName, startDateTime)
-                .setParameter(Meal.endTimeName, endDateTime)
+                .setParameter("startTime", startDateTime)
+                .setParameter("endTime", endDateTime)
                 .getResultList();
     }
 }
