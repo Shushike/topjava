@@ -4,7 +4,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-import ru.javawebinar.topjava.web.user.InMemoryAdminRestControllerTest;
 
 import java.time.*;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    private static final Logger log = LoggerFactory.getLogger(InMemoryAdminRestControllerTest.class);
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
 
     private static Map<String, Long> timeMap;
 
@@ -53,26 +52,21 @@ public class MealServiceTest {
 
         @Override
         protected void after() {
-            log.debug("Total: ");
+            StringBuilder stringBuilder = new StringBuilder("\u001B[32m\nTotal:\n");
             timeMap.forEach((s, aLong) -> {
-                log.debug(String.format("Test '%s' - %d ms", s, aLong));
+                stringBuilder.append(String.format("Test '%s' - %d ms \n", s, aLong));
             });
+            stringBuilder.append("\u001B[0m");
+            log.debug(stringBuilder.toString());
         }
     };
 
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
-        private LocalTime startTime;
-
+    public Stopwatch watcher = new Stopwatch() {
         @Override
-        protected void starting(Description description) {
-            startTime = LocalTime.now();
-        }
-
-        @Override
-        protected void finished(Description description) {
+        protected void finished(long nanos, Description description) {
             log.debug(String.format("%s - %d ms", description.getMethodName(),
-                    addTime(description.getMethodName(), Duration.between(startTime, LocalTime.now()).toMillis())));
+                    addTime(description.getMethodName(), nanos/1000000)));
         }
     };
 

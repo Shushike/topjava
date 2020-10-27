@@ -8,6 +8,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.Util;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import java.time.LocalDateTime;
@@ -26,13 +27,17 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
-            User ref = em.getReference(User.class, userId);
+            final User ref = em.getReference(User.class, userId);
             meal.setUser(ref);
             em.persist(meal);
             return meal;
         } else {
-            if (meal.getUser()!=null && meal.getUser().getId()==userId)
+            final Meal oldValue = get(meal.getId(), userId);
+            if (oldValue != null) {
+                final User ref = em.getReference(User.class, userId);
+                meal.setUser(ref);
                 return em.merge(meal);
+            }
         }
         return null;
     }
@@ -41,16 +46,26 @@ public class JpaMealRepository implements MealRepository {
     @Transactional
     public boolean delete(int id, int userId) {
         return em.createNamedQuery(Meal.DELETE)
-                .setParameter("id", id)
+                .setParameter(Meal.idName, id)
                 .setParameter(Meal.userIdName, userId)
                 .executeUpdate() != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        Map<String,Object> props = new HashMap<>();
-        props.put(Meal.userIdName, userId);
-        return em.find(Meal.class, id, props);
+        try {
+            return em.createNamedQuery(Meal.BY_ID, Meal.class)
+                    .setParameter(Meal.idName, id)
+                    .setParameter(Meal.userIdName, userId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        /*
+        Meal result = em.find(Meal.class, id);
+        if (result!=null && result.getUser()!=null && result.getUser().getId()==userId)
+            return result;
+        return null;*/
     }
 
     @Override
@@ -64,8 +79,8 @@ public class JpaMealRepository implements MealRepository {
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return em.createNamedQuery(Meal.BY_TIME, Meal.class)
                 .setParameter(Meal.userIdName, userId)
-                .setParameter(Meal.startTimeName, Util.convertToDate(startDateTime), TemporalType.TIMESTAMP)
-                .setParameter(Meal.endTimeName, Util.convertToDate(endDateTime), TemporalType.TIMESTAMP)
+                .setParameter(Meal.startTimeName, startDateTime)
+                .setParameter(Meal.endTimeName, endDateTime)
                 .getResultList();
     }
 }
