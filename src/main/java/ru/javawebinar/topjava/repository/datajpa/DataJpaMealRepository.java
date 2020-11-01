@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
@@ -11,11 +10,8 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 @Repository
 public class DataJpaMealRepository implements MealRepository {
-
     private final CrudMealRepository crudRepository;
     @PersistenceContext
     private EntityManager em;
