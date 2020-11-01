@@ -26,4 +26,9 @@ public class Profiles {
             }
         }
     }
+
+    public static String getActiveRepositoryProfile() {
+        final String activeProfile = System.getProperty("spring.profiles.active");
+        return activeProfile == null ? REPOSITORY_IMPLEMENTATION : activeProfile;
+    }
 }
