@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.assertj.core.util.Arrays;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
@@ -16,6 +15,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.TimingRules;
+
+import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
@@ -50,10 +51,6 @@ abstract public class AbstractServiceTest {
     }
 
     protected boolean isJdbcProfile() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        if (!Arrays.isNullOrEmpty(activeProfiles)) {
-            return Arrays.asList(activeProfiles).contains(Profiles.JDBC);
-        }
-        return false;
+        return List.of(environment.getActiveProfiles()).contains(Profiles.JDBC);
     }
 }

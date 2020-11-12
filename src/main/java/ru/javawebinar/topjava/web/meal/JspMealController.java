@@ -1,10 +1,13 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 
@@ -14,67 +17,66 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
+@RequestMapping(value = "/meals")
 public class JspMealController extends MealController {
 
     public JspMealController(MealService service) {
         super(service);
     }
 
-    @GetMapping("/meals")
-    public String getMeals(Model model) {
+    @GetMapping
+    public String getAll(Model model) {
         model.addAttribute("meals", super.getAll());
         return "meals";
     }
 
-    @GetMapping("/meals/delete")
-    public String doDelete(HttpServletRequest request) {
-        int id = getId(request);
+    @GetMapping("/delete")
+    public String doDelete(@RequestParam int id) {
         delete(id);
         return "redirect:/meals";
     }
 
-    @GetMapping("/meals/update")
-    public String doUpdate(HttpServletRequest request) {
-        final Meal meal = get(getId(request));
-        request.setAttribute("meal", meal);
+    @GetMapping("/update")
+    public String doUpdate(@RequestParam int id, Model model) {//HttpServletRequest request) {
+        final Meal meal = get(id);
+        model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @GetMapping("/meals/create")
-    public String doCreate(HttpServletRequest request) {
+    @GetMapping("/create")
+    public String doCreate(Model model) {
         final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        request.setAttribute("meal", meal);
+        model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @GetMapping("/meals/filter")
-    public String filter(HttpServletRequest request) {
-        LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
-        LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
-        LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
-        LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        request.setAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
+    @GetMapping("/filter")
+    public String filter(@RequestParam Map<String, String> allParams, Model model) {
+        LocalDate startDate = parseLocalDate(allParams.get("startDate"));
+        LocalDate endDate = parseLocalDate(allParams.get("endDate"));
+        LocalTime startTime = parseLocalTime(allParams.get("startTime"));
+        LocalTime endTime = parseLocalTime(allParams.get("endTime"));
+        model.addAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
         return "meals";
     }
 
-    @PostMapping("/meals")
-    public String setMeal(HttpServletRequest request) throws IOException {
-        log.warn("controller set meal "+request.getCharacterEncoding());
-        request.setCharacterEncoding("UTF-8");
+    @PostMapping
+    public String setMeal(@RequestParam Map<String, String> allParams) throws IOException {
         Meal meal = new Meal(
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
+                LocalDateTime.parse(allParams.get("dateTime")),
+                allParams.get("description"),
+                Integer.parseInt(allParams.get("calories")));
 
-        if (!StringUtils.hasText(request.getParameter("id"))) {
+        if (!StringUtils.hasText(allParams.get("id"))) {
             create(meal);
         } else {
-            update(meal, getId(request));
+            update(meal, getId(allParams.get("id")));
         }
         return "redirect:meals";
     }

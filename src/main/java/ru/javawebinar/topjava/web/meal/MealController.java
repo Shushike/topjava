@@ -19,9 +19,8 @@ import java.util.Objects;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
-@Controller
 public abstract class MealController {
-    protected static final Logger log = LoggerFactory.getLogger(MealRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(MealController.class);
 
     private final MealService service;
 
@@ -78,6 +77,11 @@ public abstract class MealController {
 
     protected int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
+        return Integer.parseInt(paramId);
+    }
+
+    protected int getId(String id) {
+        String paramId = Objects.requireNonNull(id);
         return Integer.parseInt(paramId);
     }
 }
