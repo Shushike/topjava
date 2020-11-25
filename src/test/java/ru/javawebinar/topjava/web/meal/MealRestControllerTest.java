@@ -46,12 +46,29 @@ class MealRestControllerTest extends AbstractControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "filter?startDate=2020-01-30&endDate=2020-01-30&startTime=&endTime=",
+            "filter?startDate=2020-01-30&endDate=2020-01-30&startTime=07:00&endTime=21:00",
             "filter?startDate=2020-01-30&endDate=2020-01-30"})
     void getBetweenInclusive(String path) throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + path))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(List.of(meal3, meal2, meal1), user.getCaloriesPerDay())));
+    }
+
+    @Test
+    void getBetweenInclusiveMorningMeal() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter?startDate=2020-01-30&endDate=2020-01-30&startTime=07:00&endTime=12:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(List.of(meal1), user.getCaloriesPerDay())));
+    }
+
+    @Test
+    void getBetweenInclusiveCheckParams() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter?startDate="))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(meals, user.getCaloriesPerDay())));
     }
 
     @Test
@@ -126,7 +143,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getAll() throws Exception {
         List<MealTo> expected = MealsUtil.getTos(meals, user.getCaloriesPerDay());
-        ResultActions resultActions = perform(MockMvcRequestBuilders.get(REST_URL + "all"))
+        ResultActions resultActions = perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
         resultActions.andExpect(MEAL_TO_MATCHER.contentJson(expected));
