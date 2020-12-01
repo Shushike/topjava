@@ -52,12 +52,12 @@
             </thead>
             <c:forEach items="${meals}" var="meal">
                 <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
-                <tr data-mealExcess="${meal.excess}">
+                <tr data-mealExcess="${meal.excess}" id="${meal.id}">
                     <td>${fn:formatDateTime(meal.dateTime)}</td>
                     <td>${meal.description}</td>
                     <td>${meal.calories}</td>
                     <td><a><span class="fa fa-pencil"></span></a></td>
-                    <td><a class="delete" id="${meal.id}"><span class="fa fa-remove"></span></a></td>
+                    <td><a class="delete"><span class="fa fa-remove"></span></a></td>
                 </tr>
             </c:forEach>
         </table>
@@ -83,7 +83,7 @@
 
                     <div class="form-group">
                         <label for="description" class="col-form-label"><spring:message code="meal.description"/></label>
-                        <input type="description" class="form-control" id="description" name="description"
+                        <input type="text" class="form-control" id="description" name="description"
                                placeholder="<spring:message code="meal.description"/>">
                     </div>
 
