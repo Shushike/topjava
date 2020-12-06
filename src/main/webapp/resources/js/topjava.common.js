@@ -17,6 +17,7 @@ function add() {
 }
 
 function updateRow(id) {
+
     form.find(":input").val("");
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
