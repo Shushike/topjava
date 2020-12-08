@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.util;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 
@@ -9,11 +10,12 @@ public class Util {
     private Util() {
     }
 
-    public static String getErrorMsg(BindingResult result) {
+    public static ResponseEntity getErrorResponse(BindingResult result) {
         if (result.hasErrors()) {
-            return result.getFieldErrors().stream()
-                    .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                    .collect(Collectors.joining("<br>"));
+            return ResponseEntity.unprocessableEntity().body(
+                    result.getFieldErrors().stream()
+                            .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                            .collect(Collectors.joining("<br>")));
         }
         return null;
     }

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.Util.getErrorMsg;
+import static ru.javawebinar.topjava.util.Util.getErrorResponse;
 
 @RestController
 @RequestMapping(value = "/profile/meals", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +43,7 @@ public class MealUIController extends AbstractMealController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.unprocessableEntity().body(getErrorMsg(result));
+            return getErrorResponse(result);
         }
         if (meal.isNew())
             super.create(meal);
