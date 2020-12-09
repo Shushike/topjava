@@ -11,7 +11,7 @@ public class Util {
     }
 
     public static ResponseEntity getErrorResponse(BindingResult result) {
-        if (result.hasErrors()) {
+        if (result!=null && result.hasErrors()) {
             return ResponseEntity.unprocessableEntity().body(
                     result.getFieldErrors().stream()
                             .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
