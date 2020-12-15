@@ -1,14 +1,19 @@
 package ru.javawebinar.topjava.util;
 
+import org.postgresql.util.PSQLException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import ru.javawebinar.topjava.HasId;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.*;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ru.javawebinar.topjava.util.exception.ErrorType.VALIDATION_ERROR;
 
 public class ValidationUtil {
 
@@ -79,10 +84,23 @@ public class ValidationUtil {
     }
 
     public static ResponseEntity<String> getErrorResponse(BindingResult result) {
-        return ResponseEntity.unprocessableEntity().body(
-                result.getFieldErrors().stream()
-                        .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                        .collect(Collectors.joining("<br>"))
-        );
+        return ResponseEntity.unprocessableEntity().body(getErrorString(result));
+    }
+
+    public static String getErrorString(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.joining("<br>"));
+    }
+
+    public static ErrorInfo constraintError(HttpServletRequest req, Exception e, String constraintName, String msg) {
+        Throwable rootCause = ValidationUtil.getRootCause(e);
+        if (rootCause instanceof PSQLException) {
+            PSQLException cause = (PSQLException) rootCause;
+            if (cause.getServerErrorMessage() != null && cause.getServerErrorMessage().getConstraint() != null &&
+                    cause.getServerErrorMessage().getConstraint().equals(constraintName))
+                return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, msg, "Validation error");
+        }
+        return null;
     }
 }

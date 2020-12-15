@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import ru.javawebinar.topjava.AuthorizedUser;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.ValidationUtil;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.Map;
 
 @ControllerAdvice
@@ -19,11 +22,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
         log.error("Exception at request " + req.getRequestURL(), e);
-        Throwable rootCause = ValidationUtil.getRootCause(e);
-
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-        ModelAndView mav = new ModelAndView("exception",
-                Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus));
+        Throwable rootCause = ValidationUtil.getRootCause(e);
+        ErrorInfo constraintInfo = ValidationUtil.constraintError(req, e, User.EMAIL_CONSTRAINT, User.EMAIL_ERR_MSG);
+        Map<String, Serializable> props;
+        if (constraintInfo != null) {
+            httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+            props = Map.of("exception", rootCause, "message", constraintInfo.getDetail(), "status", httpStatus);
+        } else {
+            props = Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus);
+        }
+
+        ModelAndView mav = new ModelAndView("exception", props);
         mav.setStatus(httpStatus);
 
         // Interceptor is not invoked, put userTo

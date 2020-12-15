@@ -7,16 +7,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.ValidationUtil;
-import ru.javawebinar.topjava.util.exception.ErrorInfo;
-import ru.javawebinar.topjava.util.exception.ErrorType;
-import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.util.exception.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,6 +36,9 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        ErrorInfo constraintInfo = ValidationUtil.constraintError(req, e, User.EMAIL_CONSTRAINT, User.EMAIL_ERR_MSG);
+        if (constraintInfo != null)
+            return constraintInfo;
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -46,10 +48,22 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
 
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler(InvalidPropertyException.class)
+    public ErrorInfo invalidPropertyError(HttpServletRequest req, Exception e) {
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, e.getMessage(), "Validation error");
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorInfo handleError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorInfo validationError(HttpServletRequest req, MethodArgumentNotValidException e) {
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, ValidationUtil.getErrorString(e.getBindingResult()));
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
