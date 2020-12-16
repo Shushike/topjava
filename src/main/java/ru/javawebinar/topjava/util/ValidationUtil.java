@@ -10,6 +10,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.*;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,13 @@ public class ValidationUtil {
         return result.getFieldErrors().stream()
                 .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
                 .collect(Collectors.joining("<br>"));
+    }
+
+    public static List<String> getErrors(BindingResult result) {
+        List<String> errorList = result.getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.toList());
+        return errorList;
     }
 
     public static ErrorInfo constraintError(HttpServletRequest req, Exception e, String constraintName, String msg) {

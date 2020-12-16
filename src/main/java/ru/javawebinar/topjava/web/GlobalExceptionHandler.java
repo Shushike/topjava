@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import ru.javawebinar.topjava.AuthorizedUser;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.ErrorInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,11 +26,11 @@ public class GlobalExceptionHandler {
         log.error("Exception at request " + req.getRequestURL(), e);
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         Throwable rootCause = ValidationUtil.getRootCause(e);
-        ErrorInfo constraintInfo = ValidationUtil.constraintError(req, e, User.EMAIL_CONSTRAINT, User.EMAIL_ERR_MSG);
+        ErrorInfo constraintInfo = ValidationUtil.constraintError(req, e, UserRepository.EMAIL_CONSTRAINT, User.EMAIL_ERR_MSG);
         Map<String, Serializable> props;
         if (constraintInfo != null) {
             httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-            props = Map.of("exception", rootCause, "message", constraintInfo.getDetail(), "status", httpStatus);
+            props = Map.of("exception", rootCause, "message", constraintInfo.getDetails().stream().collect(Collectors.joining("<br>")), "status", httpStatus);
         } else {
             props = Map.of("exception", rootCause, "message", rootCause.toString(), "status", httpStatus);
         }

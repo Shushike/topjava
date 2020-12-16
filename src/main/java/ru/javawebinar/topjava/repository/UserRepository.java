@@ -5,6 +5,7 @@ import ru.javawebinar.topjava.model.User;
 import java.util.List;
 
 public interface UserRepository {
+    static final String EMAIL_CONSTRAINT = "users_unique_email_idx";
     // null if not found, when updated
     User save(User user);
 

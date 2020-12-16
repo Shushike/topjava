@@ -7,6 +7,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.util.CollectionUtils;
+import ru.javawebinar.topjava.repository.UserRepository;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -24,13 +25,12 @@ import static ru.javawebinar.topjava.util.UserUtil.DEFAULT_CALORIES_PER_DAY;
         @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u ORDER BY u.name, u.email"),
 })
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = User.EMAIL_CONSTRAINT)})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = UserRepository.EMAIL_CONSTRAINT)})
 public class User extends AbstractNamedEntity {
 
     public static final String DELETE = "User.delete";
     public static final String BY_EMAIL = "User.getByEmail";
     public static final String ALL_SORTED = "User.getAllSorted";
-    public static final String EMAIL_CONSTRAINT = "users_unique_email_idx";
     public static final String EMAIL_ERR_MSG = "User with this email already exists";
 
     @Column(name = "email", nullable = false, unique = true)
